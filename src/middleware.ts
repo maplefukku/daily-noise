@@ -30,9 +30,7 @@ export async function middleware(request: NextRequest) {
   )
 
   // セッションをリフレッシュ
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
+  await supabase.auth.getSession()
 
   // MVP: 認証保護なし（LocalStorage使用）
 
