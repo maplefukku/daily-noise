@@ -25,7 +25,7 @@ vi.mock("next/server", () => {
   return { NextResponse: MockNextResponse };
 });
 
-import { middleware } from "@/middleware";
+import { proxy } from "@/proxy";
 
 function createMockRequest(pathname: string) {
   return {
@@ -39,10 +39,10 @@ function createMockRequest(pathname: string) {
         return { pathname: "/", searchParams: new URLSearchParams() };
       },
     },
-  } as unknown as Parameters<typeof middleware>[0];
+  } as unknown as Parameters<typeof proxy>[0];
 }
 
-describe("middleware", () => {
+describe("proxy", () => {
   beforeEach(() => {
     vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://test.supabase.co");
     vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "test-anon-key");
@@ -51,14 +51,14 @@ describe("middleware", () => {
 
   it("セッションをリフレッシュしてレスポンスを返す", async () => {
     mockGetSession.mockResolvedValue({ data: { session: null } });
-    const res = await middleware(createMockRequest("/"));
+    const res = await proxy(createMockRequest("/"));
     expect(res).toBeDefined();
     expect(mockGetSession).toHaveBeenCalledOnce();
   });
 
   it("/history にセッションなしでもアクセスできる（MVP）", async () => {
     mockGetSession.mockResolvedValue({ data: { session: null } });
-    const res = await middleware(createMockRequest("/history"));
+    const res = await proxy(createMockRequest("/history"));
     expect(res).toBeDefined();
   });
 
@@ -66,7 +66,7 @@ describe("middleware", () => {
     mockGetSession.mockResolvedValue({
       data: { session: { user: { id: "user-1" } } },
     });
-    const res = await middleware(createMockRequest("/history"));
+    const res = await proxy(createMockRequest("/history"));
     expect(res).toBeDefined();
   });
 });
