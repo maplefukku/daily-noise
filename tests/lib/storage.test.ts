@@ -19,7 +19,7 @@ describe("storage", () => {
     category: "podcast",
     title: "Podcastを1つ聴く",
     description: "",
-    createdAt: "2026-04-07",
+    createdAt: new Date().toISOString().slice(0, 10),
   };
 
   describe("getTodaySuggestion / setTodaySuggestion", () => {
