@@ -10,9 +10,10 @@ import {
   SheetDescription,
 } from "../sheet";
 
+import React from "react";
+
 // Mock @base-ui/react/dialog to avoid portal/DOM issues in jsdom
 vi.mock("@base-ui/react/dialog", () => {
-  const React = require("react");
   const Root = ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) =>
     React.createElement("div", { "data-testid": "sheet-root", ...props }, children);
   Root.Props = {};
