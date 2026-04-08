@@ -115,15 +115,6 @@ export function useAppState() {
     [todaySuggestion, setSuggestion, setReactions]
   );
 
-  const ensureTodaySuggestion = useCallback(() => {
-    if (!todaySuggestion) {
-      const newSuggestion = getRandomSuggestion();
-      setSuggestion(newSuggestion);
-      return newSuggestion;
-    }
-    return todaySuggestion;
-  }, [todaySuggestion, setSuggestion]);
-
   const clearAllData = useCallback(() => {
     window.localStorage.removeItem(STORAGE_KEYS.onboarded);
     window.localStorage.removeItem(STORAGE_KEYS.suggestion);
@@ -131,9 +122,14 @@ export function useAppState() {
     window.location.reload();
   }, []);
 
+  const suggestionOrFallback: TodaySuggestion = useMemo(() => {
+    if (todaySuggestion) return todaySuggestion;
+    return getRandomSuggestion();
+  }, [todaySuggestion])
+
   return {
     currentScreen: permissionScreen ? ("permission" as AppScreen) : currentScreen,
-    suggestion: todaySuggestion ?? ensureTodaySuggestion(),
+    suggestion: suggestionOrFallback,
     reactions,
     showPermission,
     dismissPermission,
