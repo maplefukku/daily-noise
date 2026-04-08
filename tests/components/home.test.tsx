@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import HomePage from "@/app/page";
@@ -27,6 +27,14 @@ vi.mock("@base-ui/react/dialog", () => ({
 
 beforeEach(() => {
   localStorage.clear();
+  // Use fake timers at noon UTC to avoid timezone mismatch
+  // between Date.toISOString() (UTC) and local date comparison in isSameDay
+  vi.useFakeTimers({ shouldAdvanceTime: true });
+  vi.setSystemTime(new Date("2026-04-09T12:00:00Z"));
+});
+
+afterEach(() => {
+  vi.useRealTimers();
 });
 
 describe("HomePage", () => {

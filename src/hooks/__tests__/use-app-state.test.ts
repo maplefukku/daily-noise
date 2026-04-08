@@ -1,5 +1,5 @@
 import { renderHook, act } from "@testing-library/react";
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { useAppState } from "../use-app-state";
 
 // Mock window.location.reload
@@ -12,6 +12,14 @@ Object.defineProperty(window, "location", {
 beforeEach(() => {
   localStorage.clear();
   reloadMock.mockClear();
+  // Use fake timers at noon UTC to avoid timezone mismatch
+  // between Date.toISOString() (UTC) and local date comparison in isSameDay
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date("2026-04-09T12:00:00Z"));
+});
+
+afterEach(() => {
+  vi.useRealTimers();
 });
 
 describe("useAppState", () => {
