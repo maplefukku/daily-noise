@@ -16,4 +16,17 @@ describe("ReactionScreen", () => {
 
     expect(screen.getByText("了解、また明日。")).toBeInTheDocument();
   });
+
+  it("doneの場合アイコンが表示される", () => {
+    const { container } = render(<ReactionScreen type="done" />);
+    // Check icon (rendered as svg by lucide-react)
+    const svg = container.querySelector("svg");
+    expect(svg).toBeInTheDocument();
+  });
+
+  it("skippedの場合アイコンが表示される", () => {
+    const { container } = render(<ReactionScreen type="skipped" />);
+    const svg = container.querySelector("svg");
+    expect(svg).toBeInTheDocument();
+  });
 });

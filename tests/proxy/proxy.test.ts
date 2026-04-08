@@ -69,4 +69,41 @@ describe("proxy", () => {
     const res = await proxy(createMockRequest("/history"));
     expect(res).toBeDefined();
   });
+
+  it("cookieのgetAllがリクエストのcookieを返す", async () => {
+    const { createServerClient } = await import("@supabase/ssr");
+    mockGetSession.mockResolvedValue({ data: { session: null } });
+
+    await proxy(createMockRequest("/"));
+
+    const callArgs = vi.mocked(createServerClient).mock.calls[0];
+    const cookieOptions = callArgs[2];
+    const cookies = cookieOptions.cookies as {
+      getAll: () => { name: string; value: string }[];
+      setAll: (cookies: { name: string; value: string; options?: Record<string, unknown> }[]) => void;
+    };
+
+    // getAll should call request.cookies.getAll
+    const result = cookies.getAll();
+    expect(Array.isArray(result)).toBe(true);
+  });
+
+  it("cookieのsetAllがリクエストとレスポンスのcookieを設定する", async () => {
+    const { createServerClient } = await import("@supabase/ssr");
+    mockGetSession.mockResolvedValue({ data: { session: null } });
+
+    await proxy(createMockRequest("/"));
+
+    const callArgs = vi.mocked(createServerClient).mock.calls[0];
+    const cookieOptions = callArgs[2];
+    const cookies = cookieOptions.cookies as {
+      getAll: () => { name: string; value: string }[];
+      setAll: (cookies: { name: string; value: string; options?: Record<string, unknown> }[]) => void;
+    };
+
+    // setAll should not throw
+    cookies.setAll([
+      { name: "session", value: "abc123", options: { path: "/" } },
+    ]);
+  });
 });

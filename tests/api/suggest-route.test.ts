@@ -12,6 +12,43 @@ vi.stubEnv("GLM_MODEL", "glm-4.7");
 describe("GET /api/suggest", () => {
   beforeEach(() => {
     mockFetch.mockReset();
+    vi.stubEnv("GLM_API_KEY", "test-api-key");
+    vi.stubEnv("GLM_BASE_URL", "https://api.z.ai/api/coding/paas/v4/");
+    vi.stubEnv("GLM_MODEL", "glm-4.7");
+  });
+
+  it("returns 500 when env vars are missing", async () => {
+    vi.stubEnv("GLM_API_KEY", "");
+    vi.stubEnv("GLM_BASE_URL", "");
+
+    const { GET } = await import("@/app/api/suggest/route");
+    const response = await GET();
+
+    expect(response.status).toBe(500);
+    const data = await response.json();
+    expect(data.error).toBe("GLM API設定が不足しています");
+  });
+
+  it("returns 500 when response has valid JSON but missing title", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        choices: [
+          {
+            message: {
+              content: JSON.stringify({ category: "Podcast" }),
+            },
+          },
+        ],
+      }),
+    });
+
+    const { GET } = await import("@/app/api/suggest/route");
+    const response = await GET();
+
+    expect(response.status).toBe(500);
+    const data = await response.json();
+    expect(data.error).toBe("不正なレスポンス形式です");
   });
 
   it("returns a suggestion from GLM API", async () => {

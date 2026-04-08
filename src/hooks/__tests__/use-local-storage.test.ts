@@ -37,6 +37,13 @@ describe("useLocalStorage", () => {
     expect(result.current[0]).toBe(1);
   });
 
+  it("localStorageに不正なJSONがある場合初期値を返す", () => {
+    window.localStorage.setItem("broken-key", "not-valid-json{{{");
+    const { result } = renderHook(() => useLocalStorage("broken-key", "fallback"));
+
+    expect(result.current[0]).toBe("fallback");
+  });
+
   it("removeValueでlocalStorageから削除される", () => {
     const { result } = renderHook(() => useLocalStorage("test-key", "initial"));
 

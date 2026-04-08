@@ -91,6 +91,20 @@ describe("storage", () => {
     });
   });
 
+  describe("getTodaySuggestion error handling", () => {
+    it("returns null when localStorage contains invalid JSON", () => {
+      localStorage.setItem("daily-noise-today", "not-valid-json{{{");
+      expect(getTodaySuggestion()).toBeNull();
+    });
+  });
+
+  describe("getReactionLogs error handling", () => {
+    it("returns empty array when localStorage contains invalid JSON", () => {
+      localStorage.setItem("daily-noise-logs", "not-valid-json{{{");
+      expect(getReactionLogs()).toEqual([]);
+    });
+  });
+
   describe("getStats", () => {
     it("returns zero counts when no logs exist", () => {
       const stats = getStats();
