@@ -1,5 +1,5 @@
 import { renderHook, act } from "@testing-library/react";
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { useLocalStorage } from "../use-local-storage";
 
 describe("useLocalStorage", () => {
@@ -57,5 +57,15 @@ describe("useLocalStorage", () => {
 
     expect(result.current[0]).toBe("initial");
     expect(window.localStorage.removeItem).toHaveBeenCalledWith("test-key");
+  });
+
+  it("SSR環境（window未定義）では初期値を返す", () => {
+    const origWindow = globalThis.window;
+    // Can't fully delete window in jsdom, but we can test the localStorage path
+    const saved = window.localStorage.getItem;
+    window.localStorage.getItem = vi.fn(() => null) as any;
+    const { result } = renderHook(() => useLocalStorage("ssr-key", "default"));
+    expect(result.current[0]).toBe("default");
+    window.localStorage.getItem = saved;
   });
 });
