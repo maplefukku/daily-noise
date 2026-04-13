@@ -30,4 +30,20 @@ describe("PermissionScreen", () => {
 
     expect(onSkip).toHaveBeenCalledOnce();
   });
+
+  it("「通知を許可する」をクリックするとNotification.requestPermissionが呼ばれonAllowが呼ばれる", async () => {
+    const user = userEvent.setup();
+    const onAllow = vi.fn();
+    const mockRequest = vi.fn().mockResolvedValue("granted");
+    vi.stubGlobal("Notification", { requestPermission: mockRequest });
+
+    render(<PermissionScreen onAllow={onAllow} onSkip={vi.fn()} />);
+
+    await user.click(screen.getByRole("button", { name: "通知を許可する" }));
+
+    expect(mockRequest).toHaveBeenCalledOnce();
+    expect(onAllow).toHaveBeenCalledOnce();
+
+    vi.unstubAllGlobals();
+  });
 });
